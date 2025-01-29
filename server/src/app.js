@@ -18,6 +18,7 @@ connectDatabase();
 app.post('/api/user', userController.create);
 app.get('/api/user', userController.findAll);
 app.get('/api/user/:id', userController.findById);
+app.patch('/api/user/:id', userController.update);
 
 app.listen(port, () => {
     console.log("Server running at port", port);
