@@ -1,24 +1,11 @@
-import mongoose from "mongoose";
 import User from "../models/user.model.js";
 
 async function create(req, res) {
-    try {
-        const {name, username, email, password, avatar, background} = req.body;
-    
-        if(!name ||
-        ! username ||
-        ! email ||
-        ! password ||
-        ! avatar ||
-        ! background
-        ) {
-            return res.status(400).send({ message: "Por favor preencha todos os campos"});
-        }
-    
+    try {    
         const newUser = await User.create(req.body);
         res.status(201).send({
-            newUser,
-            message: "Usuário cadastrado com sucesso"
+            message: "Usuário cadastrado com sucesso",
+            newUser
         });
         
     } catch (error) {
@@ -34,7 +21,7 @@ async function findAll(req, res) {
             return res.status(400).send({ message: "Nenhum usuário cadastrado"})
         }
 
-        res.status(200).json(users);
+        res.status(200).send(users);
     } catch (error) {
         res.status(400).send(error.message);
     }
@@ -43,17 +30,7 @@ async function findAll(req, res) {
 async function findById(req, res) {
     try {
         const id = req.params.id;
-
-        if(!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).send("ID inválido"); 
-        }
-
         const user = await User.findById(id).exec();
-
-        if(!user) {
-            return res.status(400).send("Usuário não encontrado");
-        }
-
         res.status(200).send(user);
 
     } catch (error) {
@@ -64,29 +41,14 @@ async function findById(req, res) {
 async function update(req, res) {
     try {
         const id = req.params.id;
-        const {name, username, email, password, avatar, background} = req.body;
-    
-        if(!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).send("ID inválido"); 
-        }
 
-        if(!name &&
-        ! username &&
-        ! email &&
-        ! password &&
-        ! avatar &&
-        ! background
-        ) {
-            return res.status(400).send({ message: "Por favor preencha pelo menos um campo a ser atualizado"});
-        }
+        await User.findByIdAndUpdate(id, req.body).exec();
+        const user = await User.findById(id).exec();
 
-        const user = await User.findByIdAndUpdate(id, req.body).exec();
-
-        if(!user) {
-            return res.status(400).send("Usuário não encontrado");
-        }
-
-        res.status(200).send(user);
+        res.status(200).send({
+            message: "Usuário atualizado com sucesso",
+            user 
+        });
     } catch (error) {
         res.status(400).send(error.message);
     }
