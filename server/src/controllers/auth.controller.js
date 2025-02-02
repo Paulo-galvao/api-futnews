@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
+import generateToken from "../services/auth.jwt.js";
 
 async function login(req, res) {
     try {
@@ -17,12 +18,13 @@ async function login(req, res) {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
-
-        if(!isPasswordValid || !user) {
+        if(!isPasswordValid) {
             return res.status(400).json({message: "Usuário ou senha incorretos"});
         }
 
-        res.status(200).send({message: "Logado na banca"})
+        const token = generateToken(user.id);
+
+        res.status(200).send({token: token})
     } catch (error) {
         res.status(400).send(error.message); 
     }
