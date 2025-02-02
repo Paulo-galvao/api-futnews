@@ -1,10 +1,12 @@
 import express from "express";
 import connectDatabase from "./config/conn.js";
+
 import userRouter from "./routes/user.route.js";
+import authRouter from "./routes/auth.route.js";
 
 import "dotenv/config";
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());
@@ -16,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/user', userRouter);
+app.use('/api/auth', authRouter);
 
 app.listen(port, () => {
     console.log("Server running at port", port); 
