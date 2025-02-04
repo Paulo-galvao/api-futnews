@@ -2,17 +2,14 @@ import News from "../models/news.model.js";
 
 async function create(req, res) {
     try {
-        const {title, text, banner} = req.body;
 
-        if(!title || !text || !banner) {
-            return res.status(400).send({message: "Por favor preencha todos os campos"});
-        }
+        const {title, text, banner} = req.body;
 
         const newData = await News.create({
             title,
             text,
             banner,
-            user: {_id: "67995544820730a7b9f3b46a"}
+            user: {_id: req.userId}
         });
         res.status(201).send({
             message: "Notícia cadastrada com sucesso",
