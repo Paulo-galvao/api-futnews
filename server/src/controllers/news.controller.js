@@ -108,4 +108,67 @@ async function topNews(req, res) {
     }
 }
 
-export default {create, findAll, topNews};
+async function findById(req, res) {
+    try {
+        const id = req.params.id;
+        const news = await News.findById(id).populate("user").exec();
+
+        if(!News) {
+            return res.status(400).send({
+                message: "Noticia não encontrada"
+            });
+        }
+
+        res.status(200).send({
+            id: news._id,
+            title: news.title,
+            text: news.text,
+            banner: news.banner,
+            likes: news.likes,
+            comments: news.comments,
+            name: news.user.name,
+            username: news.user.username,
+            userAvatar: news.user.avatar
+        });
+
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+async function searchByTitle(req, res) {
+    try {
+        const title = req.query.title;
+
+        const news = await News.find({
+            title: {$regex: `${title || ""}`, $options: "i"}
+        })
+        .sort({_id: -1})
+        .populate("user")
+        .exec();
+
+        if(news.length === 0) {
+            return res.status(400).send({
+                message: "Nenhuma notícia com esse título encontrada"
+            })
+        }
+
+        res.status(200).send(
+            news.map(n => ({
+                id: n._id,
+                title: n.title,
+                text: n.text,
+                banner: n.banner,
+                likes: n.likes,
+                comments: n.comments,
+                name: n.user.name,
+                username: n.user.username,
+                userAvatar: n.user.avatar
+            }))
+        );
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+export default {create, findAll, topNews, findById, searchByTitle};
