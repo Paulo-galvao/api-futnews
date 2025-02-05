@@ -22,16 +22,90 @@ async function create(req, res) {
 
 async function findAll(req, res) {
     try {
-        const news = await News.find().exec();
+        //paginação de dados
+        let {limit, offset} = req.query;
+        const currentUrl = req.baseUrl;
+        
+        limit = Number(limit); // limitação do número de postagens exibidas por vez 
+        offset = Number(offset); // de quanto em quanto aprecem as postagens
+
+        if(!limit) {
+            limit = 5;
+        }
+        
+        if(!offset) {
+            offset = 0;
+        }
+
+        const news = await News.find()
+        .sort({_id: -1})
+        .skip(offset)
+        .limit(limit)
+        .populate("user") // mostra os dados do user, ao invez do id
+        .exec();
+        // codigo acima inverte a ordem das postagens em relação o banco de dados
+        // e limita mostrar 5 de cada vez
+
+        const total = await News.countDocuments();
+        
+        const next = offset + limit;
+        const nextUrl = next < total ? `${currentUrl}?limit=${limit}$offset=${next}` : null;
+
+        const previous = offset - limit < 0 ? null : offset - limit;
+        const previousUrl = previous != null ? `${currentUrl}?limit=${limit}&offset=${previous}` : null;
 
         if(news.length === 0) {
             return res.status(400).send({ message: "Nenhuma notícia cadastrada"});
         }
 
-        res.status(200).send(news);
+        res.status(200).send({
+            nextUrl,
+            previousUrl,
+            limit,
+            offset,
+            total,
+            results: news.map(n => ({
+                id: n._id,
+                title: n.title,
+                text: n.text,
+                banner: n.banner,
+                likes: n.likes,
+                comments: n.comments,
+                name: n.user.name,
+                username: n.user.username,
+                userAvatar: n.user.avatar
+            }))
+        });
     } catch (error) {
         res.status(400).json(error.message);
     }
 }
 
-export default {create, findAll};
+async function topNews(req, res) {
+    try {
+        const news = await News.findOne().sort({ _id: -1}).populate("user");
+
+        if(!news) {
+            return res.status(400).send({
+                message: "Ainda não temos nenhuma notícia cadastrada"
+            })
+        }
+
+        res.send({
+            id: news._id,
+            title: news.title,
+            text: news.text,
+            banner: news.banner,
+            likes: news.likes,
+            comments: news.comments,
+            name: news.user.name,
+            username: news.user.username,
+            userAvatar: news.user.avatar
+        });
+
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+export default {create, findAll, topNews};
