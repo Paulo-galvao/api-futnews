@@ -21,11 +21,11 @@ async function authMiddleware(req, res, next) {
             return res.status(401).send({message: "Usuário não autorizado"});
         }
         
-        const {title, text, banner} = req.body;
+        // const {title, text, banner} = req.body;
     
-        if(!title || !text || !banner) {
-            return res.status(400).send({message: "Por favor preencha todos os campos"});
-        }
+        // if(!title || !text || !banner) {
+        //     return res.status(400).send({message: " AQUI Por favor preencha todos os campos"});
+        // }
     
         // verificação do token
         jwt.verify(token, secretkey, async (error, decoded) => {

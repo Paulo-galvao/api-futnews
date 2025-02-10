@@ -171,4 +171,28 @@ async function searchByTitle(req, res) {
     }
 }
 
-export default {create, findAll, topNews, findById, searchByTitle};
+async function byUser(req, res) {
+    try {
+        const id = req.userId;
+        const userNews = await News.find({user: id})
+        .sort({_id: -1})
+        .populate("user")
+        .exec();
+
+        res.status(200).send(userNews.map(n => ({
+            id: n._id,
+            title: n.title,
+            text: n.text,
+            banner: n.banner,
+            likes: n.likes,
+            comments: n.comments,
+            name: n.user.name,
+            username: n.user.username,
+            userAvatar: n.user.avatar
+        })));
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+export default {create, findAll, topNews, findById, searchByTitle, byUser};
