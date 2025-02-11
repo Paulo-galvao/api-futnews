@@ -195,4 +195,64 @@ async function byUser(req, res) {
     }
 }
 
-export default {create, findAll, topNews, findById, searchByTitle, byUser};
+async function update(req, res) {
+    try {
+        const {title, text, banner} = req.body;
+
+        if(!title && !text && !banner) {
+            return res.status(400).send({message: "Por favor preencha todos os dados"});
+        }
+
+        const userId = req.userId;
+        const id = req.params.id;
+        const news = await News.findById(id).exec();
+
+        if(userId != news.user._id) {
+            return res.status(401).send({
+                message: "Usuário não autorizado"
+            })
+        } // conferir se é o mesmo usuário que criou a noticia que sta tentando atualiza-lá
+
+        await News.findByIdAndUpdate(id, req.body).exec();
+        
+        res.status(200).send({
+            message: "Notícia atualizada com sucesso",
+            
+        });
+    } catch (error) {
+        res.status(400).send(error.message);        
+    }
+}
+
+async function destroy(req, res) {
+    try {
+        const userId = req.userId;
+        const id = req.params.id;
+        const news = await News.findById(id).exec();
+
+        if(userId != news.user._id) {
+            return res.status(401).send({message: "Usuário não autorizado"});
+        }
+
+        await News.findByIdAndDelete(id).exec();
+        
+        res.status(200).send({
+            message: "Notícia excluida com sucesso",
+            news
+        });
+    } catch (error) {
+        res.status(400).send(error.message);        
+        
+    }
+}
+
+export default {
+    create,
+    findAll, 
+    topNews, 
+    findById, 
+    searchByTitle, 
+    byUser,
+    update,
+    destroy
+};

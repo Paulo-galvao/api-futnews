@@ -10,4 +10,5 @@ project mern stack
 // busca de noticias por titulo
 // busca de noticias pelo usuario autorizado
 
-// atualização de dados para usuário cadastrado
+// atualização de dados limitada ao usuário que a criou
+// exclusão de post limitada ao usuário que a criou
