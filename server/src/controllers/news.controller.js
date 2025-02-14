@@ -241,7 +241,124 @@ async function destroy(req, res) {
             news
         });
     } catch (error) {
-        res.status(400).send(error.message);        
+        res.status(400).send(error.message);       
+    }
+}
+
+async function likePost(req, res) {
+    try {
+        const newsId = req.params.id;
+        const userId = req.userId;
+
+        const likedNews = await News.findOneAndUpdate({
+            _id: newsId,
+            "likes.userId": {$nin: [userId]}
+        },
+        {
+            $push: {likes: {userId, createdAt: new Date()}}
+        }
+        ).exec();
+
+        if(!likedNews) {
+            await News.findOneAndUpdate({
+                _id: newsId
+            }, {
+                $pull: {likes: {userId}}
+            }).exec();
+            return res.status(200).send({
+                message: "Postagem descurtida"
+            })
+        }
+
+        res.status(200).send({
+            message: "Postagem curtida com sucesso",
+            news: likedNews
+        })
+    } catch (error) {
+        res.status(400).send(error.message);       
+        
+    }
+}
+
+async function commentPost(req, res) {
+    try {
+        const newsId = req.params.id;
+        const userId = req.userId;
+        const comment = req.body.comment;
+        const commentId = Math.floor(Date.now() * Math.random()).toString(36);
+
+        if(!comment) {
+            return res.status(400).send({
+                message: "Por favor escreva um comentário"
+            });
+        }
+
+        await News.findOneAndUpdate(
+            {_id: newsId},
+            {$push: {comments: {
+                userId, 
+                commentId,
+                comment, 
+                createdAt: new Date()}}}
+        ).exec();
+
+        res.status(201).send({
+            message: "Comentário adicionado com sucesso"
+        })
+
+    } catch (error) {
+        res.status(400).send(error.message);       
+        
+    }
+}
+
+async function removeComment(req, res) {
+    try {
+        const newsId = req.params.idNews;
+        const commentId = req.params.idComment;
+        const userId = req.userId;
+        let isTheSameUser = false;
+        let commentExists = false;
+
+        const news = await News.findOne({_id: newsId}).exec();
+
+        news.comments.forEach( (comment) =>  {
+            if(comment.commentId == commentId) {
+                commentExists = true;
+            }
+            if(comment.commentId == commentId && comment.userId == userId) {
+                isTheSameUser = true;
+            }
+        });
+
+        if(!commentExists) {
+            return res.status(400).send({
+                message: "Comentário inexistente"
+            });
+        }
+
+        if(!isTheSameUser) {
+            return res.status(400).send({
+                message: "Não é possivel excluir um comentário de outro usuário"
+            });
+        }
+        
+        await News.findOneAndUpdate(
+            {_id: newsId},
+            {$pull: {comments: {
+                commentId,
+                userId, 
+                }
+            }
+            }
+        ).exec();
+
+        res.status(200).send({
+            message: "Comentário removido com sucesso"
+        })
+        
+    } catch (error) {
+        res.status(400).send(error.message);       
         
     }
 }
@@ -254,5 +371,8 @@ export default {
     searchByTitle, 
     byUser,
     update,
-    destroy
+    destroy,
+    likePost,
+    commentPost,
+    removeComment
 };

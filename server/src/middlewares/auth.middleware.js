@@ -20,22 +20,11 @@ async function authMiddleware(req, res, next) {
         if(schema !== "Bearer") {
             return res.status(401).send({message: "Usuário não autorizado"});
         }
-        
-        // const {title, text, banner} = req.body;
-    
-        // if(!title || !text || !banner) {
-        //     return res.status(400).send({message: " AQUI Por favor preencha todos os campos"});
-        // }
     
         // verificação do token
-        jwt.verify(token, secretkey, async (error, decoded) => {
-            console.log({error: error});
-            console.log(decoded);
-            
+        jwt.verify(token, secretkey, async (error, decoded) => {            
             req.userId = decoded.id;
             const userLogged = await User.findById(req.userId);
-            console.log(userLogged);
-
 
             return next();
         });

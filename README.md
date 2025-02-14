@@ -12,3 +12,6 @@ project mern stack
 
 // atualização de dados limitada ao usuário que a criou
 // exclusão de post limitada ao usuário que a criou
+
+// dar likes nas noticias
+// comentar nas noticias 
