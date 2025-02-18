@@ -9,9 +9,14 @@
         "version": "1.0.0"
     },
     "servers": [{
-        "url": "http://localhost:3021/api",
-        "description": "Local Server"
-    }],
+        "url": "https://https://api-fut-news.onrender.com/",
+        "description": "Render Server"
+    },
+    {
+      "url": "http://localhost:3021/api",
+      "description": "Local Server"
+    }
+  ],
     "path": {
         "/api/user/": {
             "post": {
