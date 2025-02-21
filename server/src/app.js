@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import connectDatabase from "./config/conn.js";
 
 import userRouter from "./routes/user.route.js";
@@ -11,6 +12,7 @@ import "dotenv/config";
 const port = process.env.PORT || 3000;
 const app = express();
 
+app.use(cors())
 app.use(express.json());
 
 connectDatabase();

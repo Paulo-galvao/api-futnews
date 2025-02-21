@@ -13,7 +13,7 @@
         "description": "Render Server"
     },
     {
-      "url": "http://localhost:3021/api",
+      "url": "http://localhost:3021/",
       "description": "Local Server"
     }
   ],
