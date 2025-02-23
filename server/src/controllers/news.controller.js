@@ -66,6 +66,7 @@ async function findAll(req, res) {
             total,
             results: news.map(n => ({
                 id: n._id,
+                createdAt: n.createdAt,
                 title: n.title,
                 text: n.text,
                 banner: n.banner,
@@ -93,6 +94,7 @@ async function topNews(req, res) {
 
         res.send({
             id: news._id,
+            createdAt: news.createdAt,
             title: news.title,
             text: news.text,
             banner: news.banner,
@@ -121,6 +123,7 @@ async function findById(req, res) {
 
         res.status(200).send({
             id: news._id,
+            createdAt: news.createdAt,
             title: news.title,
             text: news.text,
             banner: news.banner,
@@ -156,6 +159,7 @@ async function searchByTitle(req, res) {
         res.status(200).send(
             news.map(n => ({
                 id: n._id,
+                createdAt: n.createdAt,
                 title: n.title,
                 text: n.text,
                 banner: n.banner,
@@ -181,6 +185,7 @@ async function byUser(req, res) {
 
         res.status(200).send(userNews.map(n => ({
             id: n._id,
+            createdAt: n.createdAt,
             title: n.title,
             text: n.text,
             banner: n.banner,
