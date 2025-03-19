@@ -1,4 +1,4 @@
-# breaking-news
+# futnews
 project mern stack
 
 // login de usuario com username e senha
